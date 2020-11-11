@@ -55,7 +55,16 @@ const deleteCategory = async ({ params }) => {
   return { data: category };
 };
 
+const deleteCategories = async ({ body }) => {
+  console.log(body);
+  const category = await Category.deleteMany({ _id: body.categoriesIds });
+  if (!category) return { status: 404, error: "The category with the given ID was not found." };
+
+  return { data: category };
+};
+
 exports.createCategory = createCategory;
 exports.readCategories = readCategories;
 exports.updateCategory = updateCategory;
 exports.deleteCategory = deleteCategory;
+exports.deleteCategories = deleteCategories;

@@ -3,7 +3,8 @@ const {
   createCategory,
   readCategories,
   updateCategory,
-  deleteCategory
+  deleteCategory,
+  deleteCategories
 } = require("../models/category");
 const router = express.Router();
 
@@ -27,6 +28,12 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   const { data, status, error } = await deleteCategory(req);
+  if (error) return res.status(status).send(error);
+  res.send(data);
+});
+
+router.delete("/", async (req, res) => {
+  const { data, status, error } = await deleteCategories(req);
   if (error) return res.status(status).send(error);
   res.send(data);
 });
