@@ -30,6 +30,10 @@ const createCategory = async ({ body }) => {
   return { data: category };
 };
 
+const readCategory = async ({ params }) => {
+  return { data: await Category.findById(params.id) };
+};
+
 const readCategories = async () => {
   return { data: await Category.find() };
 };
@@ -56,14 +60,15 @@ const deleteCategory = async ({ params }) => {
 };
 
 const deleteCategories = async ({ body }) => {
-  console.log(body);
-  const category = await Category.deleteMany({ _id: body.categoriesIds });
-  if (!category) return { status: 404, error: "The category with the given ID was not found." };
+  const categories = await Category.deleteMany({ _id: body.categoriesIds });
+  if (!categories)
+    return { status: 404, error: "The categories with the given ID were not found." };
 
-  return { data: category };
+  return { data: categories };
 };
 
 exports.createCategory = createCategory;
+exports.readCategory = readCategory;
 exports.readCategories = readCategories;
 exports.updateCategory = updateCategory;
 exports.deleteCategory = deleteCategory;

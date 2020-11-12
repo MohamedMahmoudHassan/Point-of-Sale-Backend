@@ -4,12 +4,19 @@ const {
   readCategories,
   updateCategory,
   deleteCategory,
-  deleteCategories
+  deleteCategories,
+  readCategory
 } = require("../models/category");
 const router = express.Router();
 
 router.post("/", async (req, res) => {
   const { data, status, error } = await createCategory(req);
+  if (error) return res.status(status).send(error);
+  res.send(data);
+});
+
+router.get("/:id", async (req, res) => {
+  const { data, status, error } = await readCategory(req);
   if (error) return res.status(status).send(error);
   res.send(data);
 });
