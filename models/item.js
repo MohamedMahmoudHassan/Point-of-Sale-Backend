@@ -5,7 +5,7 @@ const { labelSchema, labelValidationSchema } = require("./label");
 const ItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
   label: { type: labelSchema, required: true },
-  categoryId: { type: mongoose.Schema.Types.ObjectId, required: true },
+  category: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Category" },
   description: { type: String },
   price: { type: Number, required: true },
   inStock: { type: Number, required: true },
@@ -17,7 +17,7 @@ const Item = mongoose.model("Item", ItemSchema);
 const validateItem = item => {
   const schema = Joi.object({
     label: labelValidationSchema.required(),
-    categoryId: Joi.objectId().required(),
+    category: Joi.objectId().required(),
     description: Joi.string(),
     price: Joi.number().required(),
     inStock: Joi.number().required(),
@@ -31,11 +31,11 @@ const createItem = async ({ body }) => {
   const { error } = validateItem(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  const { label, categoryId, description, price, inStock, isAvailable } = body;
+  const { label, category, description, price, inStock, isAvailable } = body;
   const item = new Item({
     name: label.en,
     label,
-    categoryId,
+    category,
     description,
     price,
     inStock,
@@ -51,17 +51,17 @@ const readItem = async ({ params }) => {
 };
 
 const readItems = async () => {
-  return { data: await Item.find() };
+  return { data: await Item.find().populate("category") };
 };
 
 const updateItem = async ({ body, params }) => {
   const { error } = validateItem(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  const { label, categoryId, description, price, inStock } = body;
+  const { label, category, description, price, inStock } = body;
   const item = await Item.findByIdAndUpdate(
     params.id,
-    { name: label.en, label, categoryId, description, price, inStock },
+    { name: label.en, label, category, description, price, inStock },
     { new: true }
   );
   if (!item) return { status: 404, error: "The item with the given ID was not found." };
