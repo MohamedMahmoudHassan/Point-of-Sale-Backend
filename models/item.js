@@ -8,7 +8,7 @@ const ItemSchema = new mongoose.Schema({
   categoryId: { type: mongoose.Schema.Types.ObjectId, required: true },
   description: { type: String },
   price: { type: Number, required: true },
-  inStocks: { type: Number, required: true },
+  inStock: { type: Number, required: true },
   isAvailable: { type: Boolean }
 });
 
@@ -20,7 +20,7 @@ const validateItem = item => {
     categoryId: Joi.objectId().required(),
     description: Joi.string(),
     price: Joi.number().required(),
-    inStocks: Joi.number().required(),
+    inStock: Joi.number().required(),
     isAvailable: Joi.boolean()
   });
 
@@ -31,14 +31,14 @@ const createItem = async ({ body }) => {
   const { error } = validateItem(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  const { label, categoryId, description, price, inStocks, isAvailable } = body;
+  const { label, categoryId, description, price, inStock, isAvailable } = body;
   const item = new Item({
     name: label.en,
     label,
     categoryId,
     description,
     price,
-    inStocks,
+    inStock,
     isAvailable
   });
   await item.save();
@@ -58,10 +58,10 @@ const updateItem = async ({ body, params }) => {
   const { error } = validateItem(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  const { label, categoryId, description, price, inStocks } = body;
+  const { label, categoryId, description, price, inStock } = body;
   const item = await Item.findByIdAndUpdate(
     params.id,
-    { name: label.en, label, categoryId, description, price, inStocks },
+    { name: label.en, label, categoryId, description, price, inStock },
     { new: true }
   );
   if (!item) return { status: 404, error: "The item with the given ID was not found." };
