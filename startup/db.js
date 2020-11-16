@@ -1,15 +1,29 @@
 const mongoose = require("mongoose");
 const config = require("config");
 
+const mkDbURL = dbParams => {
+  const { urlPrefix, password, url } = dbParams;
+  return urlPrefix + password + url;
+};
+
 module.exports = () => {
-  const { urlPrefix, url, password } = config.get("db");
-  const db = urlPrefix + password + url;
+  const { local, deployed } = config.get("db");
+
+  const localDb = mkDbURL(local);
+  const deployedDb = mkDbURL(deployed);
+  const mongooseOptions = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false
+  };
+
   mongoose
-    .connect(db, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-      useFindAndModify: false
-    })
-    .then(() => console.log(`Connected to database...`));
+    .connect(deployedDb, mongooseOptions)
+    .then(() => console.log(`Connected to deployed database...`))
+    .catch(() => {
+      mongoose
+        .connect(localDb, mongooseOptions)
+        .then(() => console.log(`Connected to local database...`));
+    });
 };

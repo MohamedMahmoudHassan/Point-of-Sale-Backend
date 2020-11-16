@@ -1,8 +1,15 @@
 {
   "apiHost": "http://192.168.1.4:5000",
   "db": {
-    "urlPrefix": "mongodb+srv://Admin:",
-    "password": "MPhWPxDU1hTv6bIr",
-    "url": "@cluster0.edoou.mongodb.net/main?retryWrites=true&w=majority"
+    "deployed": {
+      "urlPrefix": "mongodb+srv://Admin:",
+      "password": "MPhWPxDU1hTv6bIr",
+      "url": "@cluster0.edoou.mongodb.net/main?retryWrites=true&w=majority"
+    },
+    "local": {
+      "urlPrefix": "mongodb://localhost/",
+      "password": "",
+      "url": "point-of-sale"
+    }
   }
 }
