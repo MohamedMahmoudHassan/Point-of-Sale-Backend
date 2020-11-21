@@ -5,7 +5,7 @@ const { labelSchema, labelValidationSchema } = require("./label");
 const ItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
   label: { type: labelSchema, required: true },
-  category: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Category" },
+  category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
   description: { type: String },
   price: { type: Number, required: true },
   inStock: { type: Number, required: true },
@@ -17,7 +17,7 @@ const Item = mongoose.model("Item", ItemSchema);
 const validateItem = item => {
   const schema = Joi.object({
     label: labelValidationSchema.required(),
-    category: Joi.objectId().required(),
+    category: Joi.objectId(),
     description: Joi.string(),
     price: Joi.number().required(),
     inStock: Joi.number().required(),
@@ -47,7 +47,7 @@ const createItem = async ({ body }) => {
 };
 
 const readItem = async ({ params }) => {
-  return { data: await Item.findById(params.id) };
+  return { data: await Item.findById(params.id).populate("category") };
 };
 
 const readItems = async () => {
