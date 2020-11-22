@@ -31,7 +31,7 @@ const createItem = async ({ body }) => {
   const { error } = validateItem(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  const itemWithSameName = await Item.find({ name: body.label.en });
+  const itemWithSameName = await Item.findOne({ name: body.label.en });
   if (itemWithSameName) return { status: 400, error: "There is an item with the same name." };
 
   const { label, category, description, price, inStock, isAvailable } = body;
