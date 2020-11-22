@@ -3,7 +3,7 @@ const Joi = require("joi");
 const { labelSchema, labelValidationSchema } = require("./label");
 
 const CategorySchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true, unique: true },
   label: { type: labelSchema, required: true }
 });
 
@@ -20,6 +20,10 @@ const validateCategory = category => {
 const createCategory = async ({ body }) => {
   const { error } = validateCategory(body);
   if (error) return { status: 400, error: error.details[0].message };
+
+  const categoryWithSameName = await Category.findOne({ name: body.label.en });
+  if (categoryWithSameName)
+    return { status: 400, error: "There is a category with the same name." };
 
   const category = new Category({
     name: body.label.en,

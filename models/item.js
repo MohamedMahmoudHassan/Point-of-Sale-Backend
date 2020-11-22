@@ -3,7 +3,7 @@ const Joi = require("joi");
 const { labelSchema, labelValidationSchema } = require("./label");
 
 const ItemSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true, unique: true },
   label: { type: labelSchema, required: true },
   category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
   description: { type: String },
@@ -30,6 +30,9 @@ const validateItem = item => {
 const createItem = async ({ body }) => {
   const { error } = validateItem(body);
   if (error) return { status: 400, error: error.details[0].message };
+
+  const itemWithSameName = await Item.find({ name: body.label.en });
+  if (itemWithSameName) return { status: 400, error: "There is an item with the same name." };
 
   const { label, category, description, price, inStock, isAvailable } = body;
   const item = new Item({
