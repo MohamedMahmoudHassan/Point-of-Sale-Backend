@@ -1,10 +1,9 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
-const { labelSchema, labelValidationSchema } = require("./label");
+const _ = require("lodash");
 
 const ItemSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
-  label: { type: labelSchema, required: true },
   category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
   description: { type: String },
   price: { type: Number, required: true },
@@ -16,7 +15,7 @@ const Item = mongoose.model("Item", ItemSchema);
 
 const validateItem = item => {
   const schema = Joi.object({
-    label: labelValidationSchema.required(),
+    name: Joi.string().required(),
     category: Joi.objectId(),
     description: Joi.string(),
     price: Joi.number().required(),
@@ -36,19 +35,12 @@ const createItem = async ({ body }) => {
   const { error } = validateItem(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  if (!await isItemNameUnique(body.label.en))
+  if (!await isItemNameUnique(body.name))
     return { status: 400, error: "There is an item with the same name." };
 
-  const { label, category, description, price, inStock, isAvailable } = body;
-  const item = new Item({
-    name: label.en,
-    label,
-    category,
-    description,
-    price,
-    inStock,
-    isAvailable
-  });
+  const item = new Item(
+    _.pick(body, ["name", "category", "description", "price", "inStock", "isAvailable"])
+  );
   await item.save();
 
   return { data: item };
@@ -66,13 +58,12 @@ const updateItem = async ({ body, params }) => {
   const { error } = validateItem(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  if (!await isItemNameUnique(body.label.en, params.id))
+  if (!await isItemNameUnique(body.name, params.id))
     return { status: 400, error: "There is an item with the same name." };
 
-  const { label, category, description, price, inStock } = body;
   const item = await Item.findByIdAndUpdate(
     params.id,
-    { name: label.en, label, category, description, price, inStock },
+    _.pick(body, ["name", "category", "description", "price", "inStock", "isAvailable"]),
     { new: true }
   );
   if (!item) return { status: 404, error: "The item with the given ID was not found." };
