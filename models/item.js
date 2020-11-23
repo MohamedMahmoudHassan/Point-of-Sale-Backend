@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 const { labelSchema, labelValidationSchema } = require("./label");
+const isSameId = require("../utils/isSameId");
 
 const ItemSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
@@ -27,12 +28,17 @@ const validateItem = item => {
   return schema.validate(item);
 };
 
+const isItemNameUnique = async (itemName, itemId) => {
+  const item = await Item.findOne({ name: itemName });
+  return !item || isSameId(item._id, itemId);
+};
+
 const createItem = async ({ body }) => {
   const { error } = validateItem(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  const itemWithSameName = await Item.findOne({ name: body.label.en });
-  if (itemWithSameName) return { status: 400, error: "There is an item with the same name." };
+  if (!await isItemNameUnique(body.label.en))
+    return { status: 400, error: "There is an item with the same name." };
 
   const { label, category, description, price, inStock, isAvailable } = body;
   const item = new Item({
@@ -60,6 +66,9 @@ const readItems = async () => {
 const updateItem = async ({ body, params }) => {
   const { error } = validateItem(body);
   if (error) return { status: 400, error: error.details[0].message };
+
+  if (!await isItemNameUnique(body.label.en, params.id))
+    return { status: 400, error: "There is an item with the same name." };
 
   const { label, category, description, price, inStock } = body;
   const item = await Item.findByIdAndUpdate(
