@@ -20,7 +20,7 @@ const validateCategory = category => {
 
 const isCategoryNameUnique = async (categoryName, categoryId) => {
   const category = await Category.findOne({ name: categoryName });
-  return !category || isSameId(category._id, categoryId);
+  return !category || `${category._id}` === categoryId;
 };
 
 const createCategory = async ({ body }) => {

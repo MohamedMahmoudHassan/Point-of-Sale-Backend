@@ -30,7 +30,7 @@ const validateItem = item => {
 
 const isItemNameUnique = async (itemName, itemId) => {
   const item = await Item.findOne({ name: itemName });
-  return !item || isSameId(item._id, itemId);
+  return !item || `${item._id}` === itemId;
 };
 
 const createItem = async ({ body }) => {
