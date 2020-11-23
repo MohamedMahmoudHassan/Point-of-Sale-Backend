@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 const { labelSchema, labelValidationSchema } = require("./label");
-const isSameId = require("../utils/isSameId");
 
 const ItemSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
