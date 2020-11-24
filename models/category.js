@@ -1,35 +1,38 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
+const _ = require("lodash");
 
 const CategorySchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true }
+  name: { type: String, required: true },
+  store: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Store" }
 });
+
+CategorySchema.index({ name: 1, store: 1 }, { unique: true });
 
 const Category = mongoose.model("Category", CategorySchema);
 
 const validateCategory = category => {
   const schema = Joi.object({
-    name: Joi.string().required()
+    name: Joi.string().required(),
+    store: Joi.objectId().required()
   });
 
   return schema.validate(category);
 };
 
-const isCategoryNameUnique = async (categoryName, categoryId) => {
-  const category = await Category.findOne({ name: categoryName });
-  return !category || `${category._id}` === categoryId;
+const isCategoryNameUnique = async ({ _id, name, store }) => {
+  const category = await Category.findOne({ name, store });
+  return !category || `${category._id}` === _id;
 };
 
 const createCategory = async ({ body }) => {
   const { error } = validateCategory(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  if (!await isCategoryNameUnique(body.name))
+  if (!await isCategoryNameUnique(_.pick(body, ["name", "store"])))
     return { status: 400, error: "There is a category with the same name." };
 
-  const category = new Category({
-    name: body.name
-  });
+  const category = new Category(_.pick(body, ["name", "store"]));
   await category.save();
 
   return { data: category };
@@ -39,8 +42,8 @@ const readCategory = async ({ params }) => {
   return { data: await Category.findById(params.id) };
 };
 
-const readCategories = async () => {
-  return { data: await Category.find() };
+const readCategories = async ({ query }) => {
+  return { data: await Category.find({ store: query.store }) };
 };
 
 const updateCategory = async ({ body, params }) => {
@@ -50,7 +53,9 @@ const updateCategory = async ({ body, params }) => {
   if (!await isCategoryNameUnique(body.name, params.id))
     return { status: 400, error: "There is a category with the same name." };
 
-  const category = await Category.findByIdAndUpdate(params.id, { name: body.name }, { new: true });
+  const category = await Category.findByIdAndUpdate(params.id, _.pick(body, ["name", "store"]), {
+    new: true
+  });
   if (!category) return { status: 404, error: "The category with the given ID was not found." };
 
   return { data: category };

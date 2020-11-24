@@ -22,7 +22,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const { data, status, error } = await readCategories();
+  const { data, status, error } = await readCategories(req);
   if (error) return res.status(status).send(error);
   res.send(data);
 });
