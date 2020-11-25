@@ -72,6 +72,11 @@ const updateItem = async ({ body, params }) => {
   );
   if (!item) return { status: 404, error: "The item with the given ID was not found." };
 
+  if (!body.category && item.category) {
+    item.category = undefined;
+    await item.save();
+  }
+
   return { data: item };
 };
 
