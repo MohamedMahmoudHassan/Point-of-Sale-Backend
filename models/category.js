@@ -50,7 +50,7 @@ const updateCategory = async ({ body, params }) => {
   const { error } = validateCategory(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  if (!await isCategoryNameUnique({ ..._.pick(body, ["name", "store"]), store: params.id }))
+  if (!await isCategoryNameUnique({ ..._.pick(body, ["name", "store"]), _id: params.id }))
     return { status: 400, error: "There is a category with the same name." };
 
   const category = await Category.findByIdAndUpdate(params.id, _.pick(body, ["name", "store"]), {
