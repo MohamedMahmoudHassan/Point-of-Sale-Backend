@@ -12,7 +12,7 @@ const ItemSchema = new mongoose.Schema({
   isAvailable: { type: Boolean }
 });
 
-CategorySchema.index({ name: 1, store: 1 }, { unique: true });
+ItemSchema.index({ name: 1, store: 1 }, { unique: true });
 
 const Item = mongoose.model("Item", ItemSchema);
 
