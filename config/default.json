@@ -1,5 +1,5 @@
 {
-  "apiHost": "https://point-of-sale-1024-backend",
+  "apiHost": "https://point-of-sale-1024-backend.herokuapp.com",
   "db": {
     "deployed": {
       "urlPrefix": "mongodb+srv://Admin:",
