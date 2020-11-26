@@ -4,7 +4,8 @@ const _ = require("lodash");
 
 const CategorySchema = new mongoose.Schema({
   name: { type: String, required: true },
-  store: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Store" }
+  store: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Store" },
+  imageUrl: { type: String }
 });
 
 CategorySchema.index({ name: 1, store: 1 }, { unique: true });
@@ -14,7 +15,8 @@ const Category = mongoose.model("Category", CategorySchema);
 const validateCategory = category => {
   const schema = Joi.object({
     name: Joi.string().required(),
-    store: Joi.objectId().required()
+    store: Joi.objectId().required(),
+    imageUrl: Joi.string()
   });
 
   return schema.validate(category);
@@ -32,7 +34,7 @@ const createCategory = async ({ body }) => {
   if (!await isCategoryNameUnique(_.pick(body, ["name", "store"])))
     return { status: 400, error: "There is a category with the same name." };
 
-  const category = new Category(_.pick(body, ["name", "store"]));
+  const category = new Category(_.pick(body, ["name", "store", "imageUrl"]));
   await category.save();
 
   return { data: category };
@@ -53,9 +55,11 @@ const updateCategory = async ({ body, params }) => {
   if (!await isCategoryNameUnique({ ..._.pick(body, ["name", "store"]), _id: params.id }))
     return { status: 400, error: "There is a category with the same name." };
 
-  const category = await Category.findByIdAndUpdate(params.id, _.pick(body, ["name", "store"]), {
-    new: true
-  });
+  const category = await Category.findByIdAndUpdate(
+    params.id,
+    _.pick(body, ["name", "store", "imageUrl"]),
+    { new: true }
+  );
   if (!category) return { status: 404, error: "The category with the given ID was not found." };
 
   return { data: category };
