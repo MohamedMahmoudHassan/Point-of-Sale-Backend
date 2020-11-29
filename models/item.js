@@ -9,7 +9,8 @@ const ItemSchema = new mongoose.Schema({
   description: { type: String },
   price: { type: Number, required: true },
   inStock: { type: Number, required: true },
-  isAvailable: { type: Boolean }
+  isAvailable: { type: Boolean },
+  imageUrl: { type: String }
 });
 
 ItemSchema.index({ name: 1, store: 1 }, { unique: true });
@@ -24,7 +25,8 @@ const validateItem = item => {
     description: Joi.string(),
     price: Joi.number().required(),
     inStock: Joi.number().required(),
-    isAvailable: Joi.boolean()
+    isAvailable: Joi.boolean(),
+    imageUrl: Joi.string()
   });
 
   return schema.validate(item);
@@ -39,11 +41,20 @@ const createItem = async ({ body }) => {
   const { error } = validateItem(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  if (!await isItemNameUnique(_.pick(body, ["name", "store"])))
+  if (!(await isItemNameUnique(_.pick(body, ["name", "store"]))))
     return { status: 400, error: "There is an item with the same name." };
 
   const item = new Item(
-    _.pick(body, ["name", "category", "store", "description", "price", "inStock", "isAvailable"])
+    _.pick(body, [
+      "name",
+      "category",
+      "store",
+      "description",
+      "price",
+      "inStock",
+      "isAvailable",
+      "imageUrl"
+    ])
   );
   await item.save();
 
@@ -62,12 +73,21 @@ const updateItem = async ({ body, params }) => {
   const { error } = validateItem(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  if (!await isItemNameUnique({ ..._.pick(body, ["name", "store"]), _id: params.id }))
+  if (!(await isItemNameUnique({ ..._.pick(body, ["name", "store"]), _id: params.id })))
     return { status: 400, error: "There is an item with the same name." };
 
   const item = await Item.findByIdAndUpdate(
     params.id,
-    _.pick(body, ["name", "store", "category", "description", "price", "inStock", "isAvailable"]),
+    _.pick(body, [
+      "name",
+      "store",
+      "category",
+      "description",
+      "price",
+      "inStock",
+      "isAvailable",
+      "imageUrl"
+    ]),
     { new: true }
   );
   if (!item) return { status: 404, error: "The item with the given ID was not found." };
