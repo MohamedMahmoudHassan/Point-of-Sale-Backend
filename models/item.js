@@ -94,6 +94,7 @@ const deleteItems = async ({ body }) => {
   return { data: items };
 };
 
+exports.Item = Item;
 exports.createItem = createItem;
 exports.readItem = readItem;
 exports.readItems = readItems;
