@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
+const { Category } = require("./category");
+const { Item } = require("./item");
+const AddItemsCounter = require("../Utils/AddItemsCounter");
 
 const StoreSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true }
@@ -24,7 +27,7 @@ const createStore = async ({ body }) => {
   const { error } = validateStore(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  if (!await isStoreNameUnique(body.name))
+  if (!(await isStoreNameUnique(body.name)))
     return { status: 400, error: "There is a store with the same name." };
 
   const store = new Store({
@@ -40,14 +43,23 @@ const readStore = async ({ params }) => {
 };
 
 const readStores = async () => {
-  return { data: await Store.find() };
+  const stores = await Store.find().lean();
+
+  const items = await Item.aggregate([{ $group: { _id: "$store", ref: { $sum: 1 } } }]).sort("_id");
+  const categories = await Category.aggregate([
+    { $group: { _id: "$store", ref: { $sum: 1 } } }
+  ]).sort("_id");
+
+  return {
+    data: AddItemsCounter(AddItemsCounter(stores, categories, "noOfCategories"), items, "noOfItems")
+  };
 };
 
 const updateStore = async ({ body, params }) => {
   const { error } = validateStore(body);
   if (error) return { status: 400, error: error.details[0].message };
 
-  if (!await isStoreNameUnique(body.name, params.id))
+  if (!(await isStoreNameUnique(body.name, params.id)))
     return { status: 400, error: "There is a store with the same name." };
 
   const store = await Store.findByIdAndUpdate(params.id, { name: body.name }, { new: true });

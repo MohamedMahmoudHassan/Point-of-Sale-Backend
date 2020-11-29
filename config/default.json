@@ -4,7 +4,7 @@
     "deployed": {
       "urlPrefix": "mongodb+srv://Admin:",
       "password": "MPhWPxDU1hTv6bIr",
-      "url": "@cluster0.edoou.mongodb.net/production?retryWrites=true&w=majority"
+      "url": "@cluster0.edoou.mongodb.net/dev?retryWrites=true&w=majority"
     },
     "local": {
       "urlPrefix": "mongodb://localhost/",

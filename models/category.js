@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 const _ = require("lodash");
 const { Item } = require("./item");
+const AddItemsCounter = require("../Utils/AddItemsCounter");
 
 const CategorySchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -51,27 +52,7 @@ const readCategories = async ({ query }) => {
   );
   const categories = await Category.find({ store: query.store }).lean();
 
-  const customCategories = [];
-  let itemsCounter = 0;
-
-  categories.map(category => {
-    while (
-      itemsCounter < items.length &&
-      items[itemsCounter]._id.toString() < category._id.toString()
-    )
-      itemsCounter++;
-
-    customCategories.push({
-      ...category,
-      noOfItems:
-        itemsCounter < items.length &&
-        items[itemsCounter]._id.toString() === category._id.toString()
-          ? items[itemsCounter++].ref
-          : 0
-    });
-  });
-
-  return { data: customCategories };
+  return { data: AddItemsCounter(categories, items, "noOfItems") };
 };
 
 const updateCategory = async ({ body, params }) => {
@@ -106,6 +87,7 @@ const deleteCategories = async ({ body }) => {
   return { data: categories };
 };
 
+exports.Category = Category;
 exports.createCategory = createCategory;
 exports.readCategory = readCategory;
 exports.readCategories = readCategories;
