@@ -46,21 +46,31 @@ const readCategory = async ({ params }) => {
 };
 
 const readCategories = async ({ query }) => {
-  const items = await Item.aggregate([{ $group: { _id: "$category", ref: { $sum: 1 } } }]).sort("_id");
+  const items = await Item.aggregate([{ $group: { _id: "$category", ref: { $sum: 1 } } }]).sort(
+    "_id"
+  );
   const categories = await Category.find({ store: query.store }).lean();
 
   const customCategories = [];
   let itemsCounter = 0;
 
   categories.map(category => {
+    while (
+      itemsCounter < items.length &&
+      items[itemsCounter]._id.toString() < category._id.toString()
+    )
+      itemsCounter++;
+
     customCategories.push({
       ...category,
       noOfItems:
-        itemsCounter < items.length && items[itemsCounter]._id.toString() === category._id.toString()
+        itemsCounter < items.length &&
+        items[itemsCounter]._id.toString() === category._id.toString()
           ? items[itemsCounter++].ref
           : 0
     });
   });
+
   return { data: customCategories };
 };
 
