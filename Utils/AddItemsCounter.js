@@ -5,7 +5,8 @@ module.exports = (mainModel, secModel, counterFieldName) => {
   mainModel.map(mainDoc => {
     while (
       secDocsCounter < secModel.length &&
-      secModel[secDocsCounter]._id.toString() < mainDoc._id.toString()
+      (!secModel[secDocsCounter]._id ||
+        secModel[secDocsCounter]._id.toString() < mainDoc._id.toString())
     )
       secDocsCounter++;
 
