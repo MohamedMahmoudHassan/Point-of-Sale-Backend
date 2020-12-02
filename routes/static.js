@@ -14,8 +14,8 @@ router.get("/:name", async (req, res) => {
   data.readStream.pipe(res);
 });
 
-router.delete("/:name", (req, res) => {
-  const { data, status, error } = deleteImage(req);
+router.delete("/:name", async (req, res) => {
+  const { data, status, error } = await deleteImage(req);
   if (error) return res.status(status).send(error);
   res.send(data);
 });

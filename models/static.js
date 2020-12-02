@@ -47,8 +47,10 @@ const getImage = async ({ params }) => {
   return { data: { readStream } };
 };
 
-const deleteImage = ({ params }) => {
-  return { data: "File deleted successfully." };
+const deleteImage = async ({ params }) => {
+  if (!gfs) return { status: 404, error: "Connection error." };
+  await gfs.remove({ filename: params.name });
+  return { data: "File deleted." };
 };
 
 exports.upload = upload;
