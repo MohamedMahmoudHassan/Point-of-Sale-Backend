@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 const _ = require("lodash");
 const { Item } = require("./item");
-const AddItemsCounter = require("../Utils/AddItemsCounter");
+const addItemsCounter = require("../Utils/addItemsCounter");
 
 const CategorySchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -52,7 +52,7 @@ const readCategories = async ({ query }) => {
   );
   const categories = await Category.find({ store: query.store }).lean();
 
-  return { data: AddItemsCounter(categories, items, "noOfItems") };
+  return { data: addItemsCounter(categories, items, "noOfItems") };
 };
 
 const updateCategory = async ({ body, params }) => {

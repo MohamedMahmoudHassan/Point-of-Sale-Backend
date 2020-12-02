@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 const { Category } = require("./category");
 const { Item } = require("./item");
-const AddItemsCounter = require("../Utils/AddItemsCounter");
+const addItemsCounter = require("../Utils/addItemsCounter");
 
 const StoreSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true }
@@ -51,7 +51,7 @@ const readStores = async () => {
   ]).sort("_id");
 
   return {
-    data: AddItemsCounter(AddItemsCounter(stores, categories, "noOfCategories"), items, "noOfItems")
+    data: addItemsCounter(addItemsCounter(stores, categories, "noOfCategories"), items, "noOfItems")
   };
 };
 

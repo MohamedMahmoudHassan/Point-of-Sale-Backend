@@ -8,10 +8,10 @@ router.post("/", upload, (req, res) => {
   res.send(data);
 });
 
-router.get("/:name", (req, res) => {
-  const { data, status, error } = getImage(req);
+router.get("/:name", async (req, res) => {
+  const { data, status, error } = await getImage(req);
   if (error) return res.status(status).send(error);
-  res.sendFile(data.imagePath);
+  data.readStream.pipe(res);
 });
 
 router.delete("/:name", (req, res) => {
