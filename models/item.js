@@ -3,13 +3,11 @@ const Joi = require("joi");
 const _ = require("lodash");
 
 const ItemSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
   category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
   store: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Store" },
-  description: { type: String },
   price: { type: Number, required: true },
   inStock: { type: Number, required: true },
-  isAvailable: { type: Boolean },
   imageUrl: { type: String }
 });
 
