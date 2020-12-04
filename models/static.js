@@ -7,7 +7,8 @@ const GridFsStorage = require("multer-gridfs-storage");
 const crypto = require("crypto");
 const getDbParams = require("../Utils/getDbParams");
 
-const { dbUrl, dbOptions } = getDbParams("deployed");
+const dbType = process.env.dbType || "deployed";
+const { dbUrl, dbOptions } = getDbParams(dbType);
 let gfs;
 
 const conn = mongoose.createConnection(dbUrl, dbOptions);
@@ -30,8 +31,6 @@ const storage = new GridFsStorage({
 });
 
 const upload = multer({ storage }).single("image");
-
-const createImagePath = name => path.join(__dirname, "../static/", name);
 
 const createImage = ({ file }) => {
   if (!file) return { status: 400, error: "No image uploaded." };
