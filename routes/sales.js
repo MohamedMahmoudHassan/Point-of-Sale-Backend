@@ -1,9 +1,15 @@
 const express = require("express");
-const { createSale, readSales } = require("../models/sale");
+const { createSale, readSales, readSale } = require("../models/sale");
 const router = express.Router();
 
 router.post("/", async (req, res) => {
   const { data, status, error } = await createSale(req);
+  if (error) return res.status(status).send(error);
+  res.send(data);
+});
+
+router.get("/:id", async (req, res) => {
+  const { data, status, error } = await readSale(req);
   if (error) return res.status(status).send(error);
   res.send(data);
 });

@@ -30,7 +30,11 @@ const createSale = async ({ body }) => {
   const sale = new Sale(_.pick(body, ["items", "status", "lastUpdateOn", "store"]));
   await sale.save();
 
-  return sale;
+  return { data: sale };
+};
+
+const readSale = async ({ params }) => {
+  return { data: await Sale.findById(params.id).populate("items.item") };
 };
 
 const readSales = async ({ query }) => {
@@ -38,4 +42,5 @@ const readSales = async ({ query }) => {
 };
 
 exports.createSale = createSale;
+exports.readSale = readSale;
 exports.readSales = readSales;
