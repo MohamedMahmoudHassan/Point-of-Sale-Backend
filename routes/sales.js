@@ -1,5 +1,5 @@
 const express = require("express");
-const { createSale, readSales, readSale } = require("../models/sale");
+const { createSale, readSales, readSale, updateSale } = require("../models/sale");
 const router = express.Router();
 
 router.post("/", async (req, res) => {
@@ -16,6 +16,12 @@ router.get("/:id", async (req, res) => {
 
 router.get("/", async (req, res) => {
   const { data, status, error } = await readSales(req);
+  if (error) return res.status(status).send(error);
+  res.send(data);
+});
+
+router.put("/:id", async (req, res) => {
+  const { data, status, error } = await updateSale(req);
   if (error) return res.status(status).send(error);
   res.send(data);
 });
