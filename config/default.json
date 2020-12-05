@@ -11,5 +11,11 @@
       "password": "",
       "url": "point-of-sale"
     }
+  },
+  "emailAPI": {
+    "url": "https://rapidprod-sendgrid-v1.p.rapidapi.com/mail/send",
+    "key": "",
+    "host": "rapidprod-sendgrid-v1.p.rapidapi.com",
+    "sender": "mohamed.mahmodh@gmail.com"
   }
 }
